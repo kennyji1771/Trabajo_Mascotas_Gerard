@@ -1,27 +1,28 @@
-﻿# Archivos generados
+﻿# Archivos generados automáticamente
 *.zip
 *.backup_*
-reporte_proyecto_*.txt
+TrabajoPractico4_*.zip
+TP4_*.zip
 
 # Archivos temporales
 *.tmp
 *.temp
 *.log
 
+# Reportes generados
+reporte_proyecto_*.txt
+
 # Archivos de sistema
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Archivos de IDE
+# Archivos de IDE/editor
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Archivos de Windows
-ehthumbs.db
-Thumbs.db
+*.sublime-*
 
 # Archivos de usuario
 *.user
