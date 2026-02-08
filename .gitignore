@@ -1,0 +1,28 @@
+﻿# Archivos generados
+*.zip
+*.backup_*
+reporte_proyecto_*.txt
+
+# Archivos temporales
+*.tmp
+*.temp
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de Windows
+ehthumbs.db
+Thumbs.db
+
+# Archivos de usuario
+*.user
+*.suo

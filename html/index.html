@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabajo Práctico 4 - Base de Datos Mascotas</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Highlight.js para sintaxis SQL -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    
+    <!-- Estilos personalizados -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 76px; /* Para la navbar fija */
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .portada-imagen {
+            width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            margin-bottom: 40px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 40px;
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .sql-code {
+            background-color: #282c34;
+            color: #abb2bf;
+            border-radius: 10px;
+            padding: 25px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .info-box {
+            background-color: #e8f4fc;
+            border-left: 5px solid var(--secondary-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .student-info {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .table-custom {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .table-custom th {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        
+        .table-custom td {
+            border-color: #dee2e6;
+        }
+        
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 40px 0;
+            margin-top: 80px;
+        }
+        
+        .badge-custom {
+            background-color: var(--secondary-color);
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        
+        .animation-fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .section-card {
+                padding: 25px;
+            }
+            
+            .portada-imagen {
+                max-height: 60vh;
+            }
+            
+            body {
+                padding-top: 66px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-database me-2"></i>Base de Datos Mascotas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#portada">Portada</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#introduccion">Introducción</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#conceptual">Diseño Conceptual</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#logico">Diseño Lógico</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#fisico">Diseño Físico</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#resultados">Resultados</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#conclusiones">Conclusiones</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PORTADA CON IMAGEN - RUTA CORREGIDA: ../imagenes/Portada.png -->
+    <section id="portada" class="container-fluid p-0">
+        <div id="portada-contenedor">
+            <img src="../imagenes/Portada.png" 
+                 alt="Portada del Trabajo Práctico 4" 
+                 class="portada-imagen"
+                 id="portada-imagen"
+                 onerror="mostrarFallbackPortada()">
+        </div>
+        
+        <div id="fallback-portada" style="display: none;">
+            <div class="portada-imagen d-flex align-items-center justify-content-center" 
+                 style="min-height: 70vh; background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white;">
+                <div class="text-center p-5">
+                    <h1 class="display-4 fw-bold">BASE DE DATOS MASCOTAS</h1>
+                    <h2 class="display-5 mt-3">Trabajo Práctico 4</h2>
+                    <hr style="border-color: white; width: 50%; margin: 30px auto;">
+                    <div class="fs-4">
+                        <p>Gerard Sieveres</p>
+                        <p>UNEXCA - PNFI Nocturno</p>
+                        <p>Febrero 2026</p>
+                    </div>
+                    <div class="mt-4 p-3 bg-light text-dark rounded" style="max-width: 600px; margin: 0 auto;">
+                        <p class="mb-2"><strong>Estructura de carpetas:</strong></p>
+                        <div style="font-family: monospace; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            Trabajo_Mascotas_Gerard/<br>
+                            ├── <strong>html/</strong><br>
+                            │   └── <strong>index.html</strong> ← (TÚ ESTÁS AQUÍ)<br>
+                            └── <strong>imagenes/</strong><br>
+                                ├── <strong>Portada.png</strong> ← (IMAGEN BUSCADA)<br>
+                                └── ...
+                        </div>
+                        <p class="mt-3 mb-0 text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>RUTA CORRECTA:</strong> <code>../imagenes/Portada.png</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Hero (Información resumida) -->
+    <header class="hero-section">
+        <div class="container animation-fade-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1>Trabajo Práctico N° 4</h1>
+                    <p class="lead fs-4">Implementación de Base de Datos "Mascotas"</p>
+                    <p class="mb-4">Sistema de gestión de información para mascotas utilizando MySQL y phpMyAdmin</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <span class="badge bg-light text-dark p-2"><i class="fas fa-user me-2"></i>Gerard Sieveres</span>
+                        <span class="badge bg-light text-dark p-2"><i class="fas fa-graduation-cap me-2"></i>UNEXCA - PNFI Nocturno</span>
+                        <span class="badge bg-light text-dark p-2"><i class="fas fa-calendar me-2"></i>Febrero 2026</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center d-none d-lg-block">
+                    <i class="fas fa-paw" style="font-size: 120px; opacity: 0.8;"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Información del estudiante -->
+    <div class="container">
+        <div class="student-info animation-fade-in">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4><i class="fas fa-user-graduate me-2"></i>Información del Estudiante</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Nombre:</strong> Gerard Sieveres</li>
+                        <li><strong>C.I.:</strong> 10.849.867</li>
+                        <li><strong>Teléfono:</strong> 0414-3169947</li>
+                        <li><strong>Correo:</strong> sieveresk@gmail.com</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4><i class="fas fa-chalkboard-teacher me-2"></i>Información Académica</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Institución:</strong> Universidad Nacional Experimental de la Gran Caracas (UNEXCA)</li>
+                        <li><strong>Sede:</strong> Altagracia de Orituco</li>
+                        <li><strong>Programa:</strong> PNFI - Nocturno</li>
+                        <li><strong>Asignatura:</strong> Base de Datos</li>
+                        <li><strong>Tutor:</strong> Jean Parra</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main class="container mt-5">
+        
+        <!-- Introducción -->
+        <section id="introduccion" class="section-card animation-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-info"></i>
+                </div>
+                <h2 class="ms-3 mb-0">1. Introducción</h2>
+            </div>
+            <p>El presente documento detalla el diseño e implementación de una base de datos para la gestión de información sobre mascotas, desarrollada como parte del trabajo práctico de la asignatura Base de Datos del Programa Nacional de Formación en Informática de la Universidad Nacional Experimental de la Gran Caracas (UNEXCA).</p>
+            <p>Este proyecto aplica los conceptos teóricos adquiridos en clase sobre modelado de datos, diseño de bases de datos relacionales y lenguaje SQL (Structured Query Language). La implementación se realizó utilizando el sistema gestor de bases de datos MySQL y la herramienta administrativa phpMyAdmin, siguiendo las tres etapas fundamentales del diseño de bases de datos: conceptual, lógico y físico.</p>
+            
+            <div class="info-box">
+                <h5><i class="fas fa-bullseye me-2"></i>Objetivos específicos:</h5>
+                <ol>
+                    <li>Diseñar un modelo entidad-relación para el dominio del problema</li>
+                    <li>Transformar el modelo conceptual en un esquema relacional</li>
+                    <li>Implementar físicamente la base de datos</li>
+                    <li>Poblar la base con datos de prueba</li>
+                    <li>Ejecutar consultas SQL que demuestren el funcionamiento del sistema</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Diseño Conceptual -->
+        <section id="conceptual" class="section-card animation-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h2 class="ms-3 mb-0">2. Diseño Conceptual</h2>
+            </div>
+            <p>El diseño conceptual representa la estructura de los datos independientemente de la implementación física. Para este sistema se identificó una única entidad principal: <strong>MASCOTAS</strong>.</p>
+            
+            <h4 class="mt-4">2.1. Diagrama Entidad-Relación</h4>
+            <div class="text-center">
+                <!-- RUTA CORREGIDA: ../imagenes/diagrama_er.png -->
+                <img src="../imagenes/diagrama_er.png" 
+                     alt="Diagrama Entidad-Relación" 
+                     class="img-fluid rounded shadow"
+                     style="max-width: 80%; border: 2px solid #3498db; padding: 10px;"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/800x600/3498db/ffffff?text=Diagrama+Entidad-Relaci%C3%B3n+no+disponible'; this.style.border='2px solid #e74c3c';">
+                <p class="mt-2"><strong>Figura 1.</strong> Diagrama Entidad-Relación de la base de datos Mascotas</p>
+            </div>
+            
+            <h4 class="mt-4">2.2. Descripción de la Entidad</h4>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descripción</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>ID</strong></td>
+                            <td>Identificador único de cada registro (clave primaria)</td>
+                            <td>Entero</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nombre</strong></td>
+                            <td>Nombre propio de la mascota</td>
+                            <td>Texto</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Especie</strong></td>
+                            <td>Clasificación biológica (perro, gato, loro, etc.)</td>
+                            <td>Texto</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Raza</strong></td>
+                            <td>Variedad específica dentro de la especie</td>
+                            <td>Texto</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Edad</strong></td>
+                            <td>Tiempo de vida en años</td>
+                            <td>Entero</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sexo</strong></td>
+                            <td>Género biológico (Macho/Hembra)</td>
+                            <td>Carácter</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Diseño Lógico -->
+        <section id="logico" class="section-card animation-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <h2 class="ms-3 mb-0">3. Diseño Lógico</h2>
+            </div>
+            
+            <h4>3.1. Esquema Relacional</h4>
+            <div class="sql-code">
+<pre><code class="language-sql">MASCOTAS (
+    ID: Entero,
+    Nombre: Texto(50),
+    Especie: Texto(50),
+    Raza: Texto(50),
+    Edad: Entero,
+    Sexo: Carácter(1)
+)</code></pre>
+            </div>
+            
+            <h4 class="mt-4">3.2. Especificación de Atributos</h4>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Tipo de Dato</th>
+                            <th>Longitud</th>
+                            <th>Restricciones</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ID</td>
+                            <td>INT</td>
+                            <td>-</td>
+                            <td>PRIMARY KEY AUTO_INCREMENT</td>
+                            <td>Identificador único</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre</td>
+                            <td>VARCHAR</td>
+                            <td>50</td>
+                            <td>NOT NULL</td>
+                            <td>Nombre de la mascota</td>
+                        </tr>
+                        <tr>
+                            <td>Especie</td>
+                            <td>VARCHAR</td>
+                            <td>50</td>
+                            <td>NOT NULL</td>
+                            <td>Tipo de animal</td>
+                        </tr>
+                        <tr>
+                            <td>Raza</td>
+                            <td>VARCHAR</td>
+                            <td>50</td>
+                            <td>NULLABLE</td>
+                            <td>Raza específica</td>
+                        </tr>
+                        <tr>
+                            <td>Edad</td>
+                            <td>INT</td>
+                            <td>-</td>
+                            <td>NOT NULL</td>
+                            <td>Años de edad</td>
+                        </tr>
+                        <tr>
+                            <td>Sexo</td>
+                            <td>CHAR</td>
+                            <td>1</td>
+                            <td>NOT NULL</td>
+                            <td>M=Macho, H=Hembra</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h4 class="mt-4">3.3. Restricciones de Integridad</h4>
+            <div class="info-box">
+                <ul>
+                    <li><strong>Clave primaria:</strong> El atributo ID identifica unívocamente cada registro</li>
+                    <li><strong>Integridad de entidad:</strong> No se permiten valores nulos en los atributos ID, Nombre, Especie, Edad y Sexo</li>
+                    <li><strong>Integridad de dominio:</strong> El atributo Sexo solo acepta los valores 'M' o 'H'</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Diseño Físico -->
+        <section id="fisico" class="section-card animation-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h2 class="ms-3 mb-0">4. Diseño Físico</h2>
+            </div>
+            
+            <h4>4.1. Código SQL de Implementación</h4>
+            <div class="sql-code">
+<pre><code class="language-sql">-- Creación de la base de datos
+CREATE DATABASE IF NOT EXISTS Veterinaria_Mascotas
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_spanish_ci;
+
+-- Selección de la base de datos
+USE Veterinaria_Mascotas;
+
+-- Creación de la tabla principal
+CREATE TABLE MASCOTAS (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(50) NOT NULL,
+    Especie VARCHAR(50) NOT NULL,
+    Raza VARCHAR(50),
+    Edad INT NOT NULL,
+    Sexo CHAR(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Inserción de datos de prueba
+INSERT INTO MASCOTAS (Nombre, Especie, Raza, Edad, Sexo) VALUES
+('Max', 'Perro', 'Labrador Retriever', 5, 'M'),
+('Luna', 'Gato', 'Siamés', 3, 'H'),
+('Rocky', 'Perro', 'Bulldog Francés', 7, 'M'),
+('Mimi', 'Gato', 'Persa', 2, 'H'),
+('Coco', 'Loro', 'Guacamayo Azul', 10, 'M'),
+('Bugs', 'Conejo', 'Holandés Enano', 1, 'M');</code></pre>
+            </div>
+            
+            <h4 class="mt-4">4.2. Configuración Técnica</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-database me-2"></i>Gestor de Bases de Datos</span>
+                            <span class="badge badge-custom">MySQL 8.0 / MariaDB 10.4</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-font me-2"></i>Juego de Caracteres</span>
+                            <span class="badge badge-custom">UTF-8 (utf8mb4)</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-cogs me-2"></i>Motor de Almacenamiento</span>
+                            <span class="badge badge-custom">InnoDB</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-tools me-2"></i>Herramienta de Administración</span>
+                            <span class="badge badge-custom">phpMyAdmin 5.1</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resultados y Pruebas -->
+        <section id="resultados" class="section-card animation-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h2 class="ms-3 mb-0">5. Resultados y Pruebas</h2>
+            </div>
+            
+            <h4>5.1. Estructura de la Tabla</h4>
+            <div class="text-center">
+                <!-- RUTA CORREGIDA: ../imagenes/estructura_tabla.png -->
+                <img src="../imagenes/estructura_tabla.png" 
+                     alt="Estructura de la tabla MASCOTAS" 
+                     class="img-fluid rounded shadow"
+                     style="max-width: 90%; border: 1px solid #ddd;"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400/2c3e50/ffffff?text=Estructura+de+tabla+no+disponible'; this.style.border='2px solid #e74c3c';">
+                <p class="mt-2"><strong>Figura 2.</strong> Estructura física de la tabla MASCOTAS en phpMyAdmin</p>
+            </div>
+            
+            <h4 class="mt-4">5.2. Datos Insertados</h4>
+            <div class="text-center">
+                <!-- RUTA CORREGIDA: ../imagenes/registros_completos.png -->
+                <img src="../imagenes/registros_completos.png" 
+                     alt="Registros de la tabla MASCOTAS" 
+                     class="img-fluid rounded shadow"
+                     style="max-width: 95%;"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/800x300/3498db/ffffff?text=Registros+no+disponibles'; this.style.border='2px solid #e74c3c';">
+                <p class="mt-2"><strong>Figura 3.</strong> Registros insertados en la tabla MASCOTAS (6 registros)</p>
+            </div>
+            
+            <h4 class="mt-4">5.3. Consulta 1: Nombre y Especie</h4>
+            <div class="sql-code mb-3">
+<pre><code class="language-sql">SELECT Nombre, Especie FROM MASCOTAS;</code></pre>
+            </div>
+            <div class="text-center">
+                <!-- RUTA CORREGIDA: ../imagenes/consulta1.png -->
+                <img src="../imagenes/consulta1.png" 
+                     alt="Resultado Consulta 1" 
+                     class="img-fluid rounded shadow"
+                     style="max-width: 70%;"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/600x200/e74c3c/ffffff?text=Consulta+1+no+disponible'; this.style.border='2px solid #e74c3c';">
+                <p class="mt-2"><strong>Figura 4.</strong> Resultado de la consulta de nombres y especies</p>
+            </div>
+            
+            <h4 class="mt-4">5.4. Consulta 2: Nombre y Sexo con Alias</h4>
+            <div class="sql-code mb-3">
+<pre><code class="language-sql">SELECT 
+    Nombre AS 'Nombre de la Mascota',
+    CASE 
+        WHEN Sexo = 'M' THEN 'Macho'
+        WHEN Sexo = 'H' THEN 'Hembra'
+    END AS 'Género'
+FROM MASCOTAS;</code></pre>
+            </div>
+            <div class="text-center">
+                <!-- RUTA CORREGIDA: ../imagenes/consulta2.png -->
+                <img src="../imagenes/consulta2.png" 
+                     alt="Resultado Consulta 2" 
+                     class="img-fluid rounded shadow"
+                     style="max-width: 70%;"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/600x200/9b59b6/ffffff?text=Consulta+2+no+disponible'; this.style.border='2px solid #e74c3c';">
+                <p class="mt-2"><strong>Figura 5.</strong> Resultado de la consulta con alias y transformación de datos</p>
+            </div>
+            
+            <h4 class="mt-4">5.5. Consulta 3: Nombre y Fecha de Nacimiento Aproximada</h4>
+            <div class="sql-code mb-3">
+<pre><code class="language-sql">SELECT 
+    Nombre,
+    DATE_SUB(CURDATE(), INTERVAL Edad YEAR) AS 'Fecha de Nacimiento Aprox.'
+FROM MASCOTAS;</code></pre>
+            </div>
+            <div class="text-center">
+                <!-- RUTA CORREGIDA: ../imagenes/consulta3.png -->
+                <img src="../imagenes/consulta3.png" 
+                     alt="Resultado Consulta 3" 
+                     class="img-fluid rounded shadow"
+                     style="max-width: 70%;"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/600x200/2ecc71/ffffff?text=Consulta+3+no+disponible'; this.style.border='2px solid #e74c3c';">
+                <p class="mt-2"><strong>Figura 6.</strong> Resultado de la consulta con cálculo de fecha de nacimiento</p>
+            </div>
+        </section>
+
+        <!-- Conclusiones -->
+        <section id="conclusiones" class="section-card animation-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-flag-checkered"></i>
+                </div>
+                <h2 class="ms-3 mb-0">6. Conclusiones</h2>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary"><i class="fas fa-check-circle me-2"></i>Logros Alcanzados</h5>
+                            <ul>
+                                <li>Base de datos diseñada e implementada exitosamente</li>
+                                <li>Proceso de desarrollo completo (conceptual, lógico, físico)</li>
+                                <li>6 registros insertados correctamente</li>
+                                <li>3 consultas SQL ejecutadas con éxito</li>
+                                <li>Uso efectivo de phpMyAdmin como herramienta</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary"><i class="fas fa-rocket me-2"></i>Recomendaciones Futuras</h5>
+                            <ul>
+                                <li>Ampliación del modelo con más entidades</li>
+                                <li>Implementación de una interfaz web</li>
+                                <li>Sistema de backup automático</li>
+                                <li>Control de acceso y seguridad</li>
+                                <li>Documentación actualizada del diccionario de datos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 info-box">
+                <h5><i class="fas fa-lightbulb me-2"></i>Reflexión Final</h5>
+                <p>Este trabajo constituye una base sólida para extensiones futuras, como la incorporación de tablas adicionales (dueños, veterinarios, vacunas) y la implementación de una interfaz de aplicación web. La experiencia con phpMyAdmin resultó valiosa para comprender el funcionamiento de los sistemas gestores de bases de datos en entornos reales.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4><i class="fas fa-database me-2"></i>Trabajo Práctico 4</h4>
+                    <p>Implementación de Base de Datos "Mascotas"</p>
+                    <p>Universidad Nacional Experimental de la Gran Caracas (UNEXCA)<br>PNFI - Nocturno<br>Sede: Altagracia de Orituco</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Información de Contacto</h5>
+                    <p><i class="fas fa-user me-2"></i>Gerard Sieveres</p>
+                    <p><i class="fas fa-envelope me-2"></i>sieveresk@gmail.com</p>
+                    <p><i class="fas fa-calendar me-2"></i>Febrero 2026</p>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <div class="text-center">
+                <p class="mb-0">© 2026 - Todos los derechos reservados | Trabajo académico con fines educativos</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts personalizados -->
+    <script>
+        // Función para mostrar fallback de portada
+        function mostrarFallbackPortada() {
+            const portadaImg = document.getElementById('portada-imagen');
+            const fallback = document.getElementById('fallback-portada');
+            
+            if (portadaImg && fallback) {
+                portadaImg.style.display = 'none';
+                fallback.style.display = 'block';
+            }
+        }
+        
+        // Scroll suave para los enlaces del navbar
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Efecto de aparición al hacer scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('animation-fade-in');
+                }
+            });
+        }, observerOptions);
+        
+        // Observar todas las secciones
+        document.querySelectorAll('.section-card').forEach(section => {
+            observer.observe(section);
+        });
+        
+        // Verificador de imágenes al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("=== VERIFICACIÓN DE IMÁGENES ===");
+            console.log("HTML ubicado en:", window.location.href);
+            console.log("Estructura esperada: Trabajo_Mascotas_Gerard/html/index.html → ../imagenes/");
+            
+            // Verificar portada
+            const portadaImg = document.getElementById('portada-imagen');
+            if (portadaImg) {
+                console.log("Portada cargando desde:", portadaImg.src);
+                
+                const testImg = new Image();
+                testImg.onload = function() {
+                    console.log("✅ Portada cargada correctamente (" + this.width + "x" + this.height + ")");
+                };
+                testImg.onerror = function() {
+                    console.log("❌ Portada NO encontrada en:", portadaImg.src);
+                    console.log("Intentando rutas alternativas...");
+                };
+                testImg.src = portadaImg.src;
+            }
+            
+            // Mostrar año actual en el footer
+            const currentYear = new Date().getFullYear();
+            const yearElements = document.querySelectorAll('.current-year');
+            yearElements.forEach(element => {
+                element.textContent = currentYear;
+            });
+        });
+        
+        // Función para probar rutas alternativas si fallan las imágenes
+        function probarRutaAlternativa(imgElement, rutasAlternativas) {
+            let intento = 0;
+            
+            function probarSiguiente() {
+                if (intento >= rutasAlternativas.length) return;
+                
+                const testImg = new Image();
+                testImg.onload = function() {
+                    imgElement.src = rutasAlternativas[intento];
+                    console.log("✅ Imagen encontrada en ruta alternativa:", rutasAlternativas[intento]);
+                };
+                testImg.onerror = function() {
+                    intento++;
+                    probarSiguiente();
+                };
+                testImg.src = rutasAlternativas[intento];
+            }
+            
+            probarSiguiente();
+        }
+    </script>
+</body>
+</html>
