@@ -1,6 +1,9 @@
 { 
-  "  \"rewrites\": [" 
-  "    { \"source\": \"/\", \"destination\": \"/html/index.html\" }," 
-  "    { \"source\": \"/(.*)\", \"destination\": \"/html/index.html\" }" 
+  "  \"version\": 2," 
+  "  \"builds\": [" 
+  "    { \"src\": \"html/index.html\", \"use\": \"@vercel/static\" }" 
+  "  ]," 
+  "  \"routes\": [" 
+  "    { \"src\": \"/(.*)\", \"dest\": \"/html/index.html\" }" 
   "  ]" 
 } 
